@@ -335,13 +335,16 @@ impl<'a> StopExporter<'a> {
     fn generate_centroid(&self, coord: &'a Coord) -> Option<Element> {
         if *coord != Coord::default() {
             if let Ok(coord_epsg2154) = self.converter.convert(*coord) {
+                let lat = Element::builder("Latitude").append(Node::Text(format!("{}", coord.lat))).build();
+                let lon = Element::builder("Longitude").append(Node::Text(format!("{}", coord.lon))).build();
+
                 let coord_text =
                     Node::Text(format!("{} {}", coord_epsg2154.lon, coord_epsg2154.lat));
                 let pos = Element::builder("gml:pos")
                     .attr("srsName", "EPSG:2154")
                     .append(coord_text)
                     .build();
-                let location = Element::builder("Location").append(pos).build();
+                let location = Element::builder("Location").append(lat).append(lon).append(pos).build();
                 let centroid = Element::builder("Centroid").append(location).build();
                 return Some(centroid);
             }
