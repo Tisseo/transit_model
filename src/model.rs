@@ -30,7 +30,7 @@ use std::{
     hash::{Hash, Hasher},
     ops,
 };
-use tracing::{debug, warn};
+use tracing::{debug, info, warn};
 use typed_index_collection::{Collection, CollectionWithId, Id, Idx};
 
 /// Physical mode for Air
@@ -192,7 +192,7 @@ impl Collections {
     /// calendars
     pub fn sanitize(&mut self) -> Result<()> {
         fn log_object_removed(object_type: &str, id: &str) {
-            debug!("{} with ID {} has been removed", object_type, id);
+            info!("{} with ID {} has been removed", object_type, id);
         }
         fn log_predicate<'a, T, F>(object_type: &'a str, mut f: F) -> impl 'a + FnMut(&T) -> bool
         where
@@ -369,7 +369,7 @@ impl Collections {
             .take()
             .into_iter()
             .filter(|sp| {
-                if stop_points_used.contains(&sp.id) {
+                // if stop_points_used.contains(&sp.id) {
                     stop_area_ids_used.insert(sp.stop_area_id.clone());
                     if let Some(geo_id) = &sp.geometry_id {
                         geometries_used.insert(geo_id.clone());
@@ -385,10 +385,10 @@ impl Collections {
                         addresses_used.insert(address_id.clone());
                     }
                     true
-                } else {
-                    log_object_removed("Stop Point", &sp.id);
-                    false
-                }
+                // } else {
+                //    log_object_removed("Stop Point", &sp.id);
+                //    false
+                // }
             })
             .collect::<Vec<_>>();
 
@@ -399,7 +399,7 @@ impl Collections {
             .take()
             .into_iter()
             .filter(|l| {
-                if line_ids_used.contains(&l.id) {
+                // if line_ids_used.contains(&l.id) {
                     if let Some(geo_id) = &l.geometry_id {
                         geometries_used.insert(geo_id.clone());
                     }
@@ -409,10 +409,10 @@ impl Collections {
                     booking_rules_used
                         .extend(&mut l.booking_rule_links.iter().map(|id| id.to_string()));
                     true
-                } else {
-                    log_object_removed("Line", &l.id);
-                    false
-                }
+                // } else {
+                //     log_object_removed("Line", &l.id);
+                //     false
+                // }
             })
             .collect::<Vec<_>>();
         let mut contributors_used: HashSet<String> = HashSet::new();
